@@ -1,0 +1,72 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+</head>
+<body class='default'>
+    <input type="radio" id="Eng" name="lang" value="en" checked />
+    <label>English</label><br>
+    <input type="radio" id="Ara" name="lang" value="ar" />
+    <label> Arabic</label><br>
+
+
+    <input type="file" id="Files" class="form-control" accept="application/pdf" /><br />
+    <input type="button" id="UploadBtn" class="btn btn-info" value="Upload" onclick="UploadDocument()" />
+
+    <script type="text/javascript">
+        var table;
+        var IsEventAssigned = false;
+
+        $(document).ready(function () {
+        });
+
+
+        function UploadDocument() {
+            var lang = $('input[name="lang"]:checked').val();
+
+            var fileUpload = $("#Files").get(0);
+            var files = fileUpload.files;
+            // Create FormData object
+            var formData = new FormData();
+            formData.append('lang', lang);
+            // Looping over all files and add it to FormData object
+            for (var i = 0; i < files.length; i++) {
+                formData.append(files[i].name, files[i]);
+            }
+            $.ajax({
+                url: "@Url.Action("UploadDocument")",
+                type: "POST",
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                data: formData,
+                async: false,
+                dataType: "json",
+                error: function (err) {
+                    alert(err.statusText);
+                },
+                success: function (response) {
+                    switch (response.RCode) {
+                        case 0:
+                            $("#Files").val('');
+                            alert("Document Uploaded Successfully");
+                            break;
+                        case 1:
+                            alert(response.Message);
+                            break;
+                        default:
+                            alert(gErrorMsg);
+                    }
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
+
+
